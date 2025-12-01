@@ -4,7 +4,7 @@ An interactive music installation that uses computer vision to detect people for
 
 ## 🌐 Web Version (NEW!)
 
-**Try it now in your browser:** [https://yongyi2002.github.io/body_circuit_band/](https://yongyi2002.github.io/body_circuit_band/)
+**Try it now in your browser:** (https://kaitongg-bit.github.io/body_circuit_web/)
 
 The web version uses TensorFlow.js with MoveNet for real-time pose detection directly in your browser. No installation required!
 
