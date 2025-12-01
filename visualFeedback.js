@@ -100,22 +100,32 @@ export class VisualFeedback {
 
     /**
      * Draw connections between persons
-     * @param {Array} persons - Array of 3 persons [A, B, C]
-     * @param {Array} distances - Array of 3 distances
+     * @param {Array} persons - Array of persons
+     * @param {Array} distances - Array of distances
      * @param {boolean} circuitClosed - Circuit state
      * @param {number} width - Canvas width
      * @param {number} height - Canvas height
      * @param {number} threshold - Distance threshold
      */
     drawConnections(persons, distances, circuitClosed, width, height, threshold) {
-        const [personA, personB, personC] = persons;
-        const [d1, d2, d3] = distances;
+        if (!persons || persons.length < 2 || !distances || distances.length === 0) {
+            return;
+        }
 
-        const connections = [
-            { p1: personA.rightWrist, p2: personB.leftWrist, dist: d1, label: 'A→B' },
-            { p1: personB.rightWrist, p2: personC.leftWrist, dist: d2, label: 'B→C' },
-            { p1: personC.rightWrist, p2: personA.leftWrist, dist: d3, label: 'C→A' }
-        ];
+        const connections = [];
+
+        for (let i = 0; i < persons.length; i++) {
+            const currentPerson = persons[i];
+            const nextPerson = persons[(i + 1) % persons.length];
+            const dist = distances[i];
+
+            connections.push({
+                p1: currentPerson.rightWrist,
+                p2: nextPerson.leftWrist,
+                dist: dist,
+                label: `${currentPerson.id}→${nextPerson.id}`
+            });
+        }
 
         connections.forEach(conn => {
             const x1 = conn.p1.x * width;

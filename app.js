@@ -252,19 +252,39 @@ class BodyCircuitBandApp {
         try {
             // Detect poses
             const poses = await this.poseDetector.detectPoses(this.video);
-            const person = this.poseDetector.extractPerson(
-                poses,
-                this.video.videoWidth,
-                this.video.videoHeight
-            );
+
+            let persons = [];
+            let stability = 1.0; // Default stability for multi-person
+
+            if (this.currentMode === 'solo') {
+                const person = this.poseDetector.extractPerson(
+                    poses,
+                    this.video.videoWidth,
+                    this.video.videoHeight
+                );
+
+                if (person) {
+                    const result = this.soloMode.createVirtualPersons(person);
+                    persons = result.persons;
+                    stability = result.stability;
+                }
+            } else {
+                // Multi-person mode
+                persons = this.poseDetector.extractMultiplePersons(
+                    poses,
+                    this.video.videoWidth,
+                    this.video.videoHeight,
+                    this.personCount
+                );
+                // In multi-mode, we assume stability is good enough if detection works
+                // or we could implement individual stability tracking later
+                stability = 1.0;
+            }
 
             // Clear canvas
             this.visualFeedback.clear();
 
-            if (person) {
-                // Create virtual persons (solo mode)
-                const { persons, stability } = this.soloMode.createVirtualPersons(person);
-
+            if (persons.length > 0) {
                 // Update circuit detector
                 const { state, avgDistance, distances, stateChanged } =
                     this.circuitDetector.update(persons);
@@ -318,10 +338,9 @@ class BodyCircuitBandApp {
 
                 // Debug logging every 30 frames
                 if (this.frameCount % 30 === 0) {
-                    const handsRaised = this.poseDetector.isHandsRaised(person);
-                    console.log(`Frame ${this.frameCount}: Person detected, hands_raised=${handsRaised}`);
-                    console.log(`   Stability: ${stability.toFixed(2)} (1.0=still, 0.0=unstable)`);
-                    console.log(`   Distance: A→B=${distances[0].toFixed(3)}, B→C=${distances[1].toFixed(3)}, C→A=${distances[2].toFixed(3)}`);
+                    console.log(`Frame ${this.frameCount}: ${persons.length} persons detected`);
+                    console.log(`   Stability: ${stability.toFixed(2)}`);
+                    console.log(`   Distances: ${distances.map(d => d.toFixed(3)).join(', ')}`);
                     console.log(`   Avg distance: ${avgDistance.toFixed(3)}, Circuit: ${state ? 'closed' : 'open'}`);
                 }
             } else {

@@ -37,31 +37,34 @@ export class CircuitDetector {
 
     /**
      * Check if circuit is closed (instant, no debouncing)
-     * @param {Array} persons - Array of 3 person objects [A, B, C]
+     * @param {Array} persons - Array of person objects
      * @returns {Object} { isClosed, avgDistance, distances }
      */
     checkCircuit(persons) {
-        if (!persons || persons.length !== 3) {
-            return { isClosed: false, avgDistance: 1.0, distances: [1.0, 1.0, 1.0] };
+        if (!persons || persons.length < 2) {
+            return { isClosed: false, avgDistance: 1.0, distances: [] };
         }
-
-        const [personA, personB, personC] = persons;
 
         // Check if all hands are raised
         if (!this.allHandsRaised(persons)) {
-            return { isClosed: false, avgDistance: 1.0, distances: [1.0, 1.0, 1.0] };
+            return { isClosed: false, avgDistance: 1.0, distances: new Array(persons.length).fill(1.0) };
         }
 
-        // Calculate distances between hands
-        // A's right hand to B's left hand
-        const d1 = this.calculateDistance(personA.rightWrist, personB.leftWrist);
-        // B's right hand to C's left hand
-        const d2 = this.calculateDistance(personB.rightWrist, personC.leftWrist);
-        // C's right hand to A's left hand
-        const d3 = this.calculateDistance(personC.rightWrist, personA.leftWrist);
+        const distances = [];
+        let totalDistance = 0;
 
-        const distances = [d1, d2, d3];
-        const avgDistance = (d1 + d2 + d3) / 3;
+        // Calculate distances between adjacent persons
+        for (let i = 0; i < persons.length; i++) {
+            const currentPerson = persons[i];
+            const nextPerson = persons[(i + 1) % persons.length]; // Wrap around to first person
+
+            // Current person's right hand to next person's left hand
+            const dist = this.calculateDistance(currentPerson.rightWrist, nextPerson.leftWrist);
+            distances.push(dist);
+            totalDistance += dist;
+        }
+
+        const avgDistance = totalDistance / persons.length;
 
         // Check if all distances are below threshold
         const allClose = distances.every(d => d < this.distanceThreshold);
