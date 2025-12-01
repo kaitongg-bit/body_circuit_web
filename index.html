@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Body Circuit Band - Interactive Music Installation</title>
+    <meta name="description" content="An interactive music installation using pose detection. Raise your hands to create music!">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🎵 Body Circuit Band</h1>
+            <p class="subtitle">Interactive Music Installation - Solo Mode</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Video Canvas Section -->
+            <div class="video-section">
+                <div class="canvas-wrapper">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas"></canvas>
+                </div>
+                
+                <!-- Status Panel Overlay -->
+                <div id="statusPanel" class="status-panel">
+                    <div class="status-header">
+                        <span class="mode-badge">SOLO TEST MODE</span>
+                    </div>
+                    <div class="status-main">
+                        <div id="circuitStatus" class="circuit-status">CIRCUIT OPEN</div>
+                        <div class="status-details">
+                            <div class="detail-item">
+                                <span class="label">Avg Distance:</span>
+                                <span id="avgDistance" class="value">--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Stability:</span>
+                                <span id="stability" class="value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="volumeSection" class="volume-section" style="display: none;">
+                        <div class="volume-label">
+                            <span>Volume:</span>
+                            <span id="volumePercent">0%</span>
+                        </div>
+                        <div class="volume-bar-container">
+                            <div id="volumeBar" class="volume-bar"></div>
+                        </div>
+                        <div class="audio-layers">
+                            <span id="layerInfo" class="layer-info">Layers: 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions Panel -->
+            <div class="instructions-panel">
+                <h2>📖 How to Use</h2>
+                <ol class="instructions-list">
+                    <li><strong>Click "Start"</strong> and allow camera access</li>
+                    <li><strong>Raise both hands</strong> above your shoulders</li>
+                    <li><strong>Stay still</strong> to close the circuit and start music</li>
+                    <li><strong>Keep very still</strong> to unlock all 3 audio layers (Drums + Bass + Harmony)</li>
+                    <li><strong>Lower hands</strong> to stop the music</li>
+                </ol>
+
+                <div class="info-box">
+                    <h3>🎶 Layered Music System</h3>
+                    <ul>
+                        <li><strong>Very Stable:</strong> 3 Layers (Drums + Bass + Harmony)</li>
+                        <li><strong>Moderately Stable:</strong> 2 Layers (Drums + Bass)</li>
+                        <li><strong>Slight Movement:</strong> 1 Layer (Drums only)</li>
+                    </ul>
+                    <p class="tip">💡 <strong>Tip:</strong> Raise your hands and stay completely still to experience the full layered music!</p>
+                </div>
+
+                <div class="info-box technical">
+                    <h3>🔧 Technical Info</h3>
+                    <p><strong>Solo Test Mode:</strong> Your pose is replicated to 3 virtual positions (A, B, C) to simulate the full circuit experience.</p>
+                    <p><strong>Circuit Closes When:</strong> All virtual persons have hands raised AND the distances between their hands are small enough.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <button id="startBtn" class="btn btn-primary">Start</button>
+            <button id="stopBtn" class="btn btn-secondary" disabled>Stop</button>
+            <div class="status-indicator">
+                <span class="indicator-dot" id="statusDot"></span>
+                <span id="appStatus">Ready to start</span>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p id="loadingText">Loading pose detection model...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Created for CMU 48-727: Inquiry to Creative Design</p>
+            <p>
+                <a href="https://github.com/yongyi2002/body_circuit_band" target="_blank">
+                    View on GitHub
+                </a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>

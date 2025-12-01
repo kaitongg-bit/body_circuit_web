@@ -2,18 +2,36 @@
 
 An interactive music installation that uses computer vision to detect people forming a circuit by holding hands. When the circuit is complete, music plays!
 
+## 🌐 Web Version (NEW!)
+
+**Try it now in your browser:** [https://yongyi2002.github.io/body_circuit_band/](https://yongyi2002.github.io/body_circuit_band/)
+
+The web version uses TensorFlow.js with MoveNet for real-time pose detection directly in your browser. No installation required!
+
+### Quick Start (Web)
+1. Visit the link above
+2. Click "Start" and allow camera access
+3. Raise both hands above your shoulders
+4. Stay still to close the circuit and start the music
+5. Keep very still to unlock all 3 audio layers!
+
 ## 🌟 Features
 
-- **Multi-person pose detection** using YOLOv8-Pose
+- **Multi-person pose detection** using YOLOv8-Pose (Python) or MoveNet (Web)
 - **Interactive circuit detection** - hold hands to complete the circuit
 - **Dynamic audio playback** - volume adjusts based on hand proximity
+- **Layered music system** - unlock more instruments by staying still
 - **Multiple modes**:
-  - 2-person mode
-  - 3-person mode
-  - Interactive mode (supports any number of people)
-  - Solo test mode (single person testing)
+  - 2-person mode (Python)
+  - 3-person mode (Python)
+  - Interactive mode (Python)
+  - Solo test mode (Python & Web)
 
-## 📋 Requirements
+---
+
+## 💻 Python Version (Desktop)
+
+### 📋 Requirements
 
 - Python 3.8+
 - Webcam
@@ -84,10 +102,18 @@ Key parameters (in each file):
 
 ## 🛠️ Technical Details
 
+### Python Version
 - **Pose Detection**: YOLOv8n-pose model
 - **Audio Engine**: Pygame mixer
 - **Computer Vision**: OpenCV
 - **Key Points Tracked**: Shoulders and wrists
+
+### Web Version
+- **Pose Detection**: TensorFlow.js MoveNet (SinglePose Lightning)
+- **Audio Engine**: Web Audio API
+- **Rendering**: HTML5 Canvas
+- **Key Points Tracked**: Shoulders and wrists
+- **Browser Requirements**: Modern browser with camera support (Chrome, Firefox, Safari)
 
 ## 📝 Controls
 
@@ -105,6 +131,10 @@ This project is open source and available under the MIT License.
 ## 🎓 Course Project
 
 This project was created for CMU course 48-727: Inquiry to Creative Design.
+
+## 🌐 Deployment
+
+The web version is automatically deployed to GitHub Pages from the `main` branch. Any updates pushed to `main` will be reflected on the live site within a few minutes.
 
 ---
 
