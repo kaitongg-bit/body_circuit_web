@@ -14,6 +14,11 @@ export class PoseDetector {
      */
     async initialize() {
         try {
+            // Set backend to webgl to avoid webgpu compatibility issues
+            await tf.setBackend('webgl');
+            await tf.ready();
+            console.log(`✅ Using TF backend: ${tf.getBackend()}`);
+
             // Load MoveNet model (SinglePose Lightning for speed)
             this.model = poseDetection.SupportedModels.MoveNet;
             const detectorConfig = {
