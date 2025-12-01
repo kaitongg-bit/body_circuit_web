@@ -1,20 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Body Circuit Band - Interactive Music Installation</title>
-    <meta name="description" content="An interactive music installation using pose detection. Raise your hands to create music!">
+    <meta name="description"
+        content="An interactive music installation using pose detection. Raise your hands to create music!">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0"></script>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
         <header class="header">
             <h1>🎵 Body Circuit Band</h1>
-            <p class="subtitle">Interactive Music Installation - Solo Mode</p>
+            <p class="subtitle">Interactive Music Installation</p>
+
+            <!-- Mode Selector -->
+            <div class="mode-selector">
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="solo" checked>
+                    <span>Solo Mode (1 person)</span>
+                </label>
+                <label class="mode-option">
+                    <input type="radio" name="mode" value="multi">
+                    <span>Multi-Person Mode</span>
+                </label>
+                <div class="person-count-selector" id="personCountSelector" style="display: none;">
+                    <label for="personCount">Number of people:</label>
+                    <select id="personCount">
+                        <option value="2">2 people</option>
+                        <option value="3" selected>3 people</option>
+                        <option value="4">4 people</option>
+                        <option value="5">5 people</option>
+                    </select>
+                </div>
+            </div>
         </header>
 
         <!-- Main Content -->
@@ -25,11 +49,11 @@
                     <video id="video" autoplay playsinline></video>
                     <canvas id="canvas"></canvas>
                 </div>
-                
+
                 <!-- Status Panel Overlay -->
                 <div id="statusPanel" class="status-panel">
                     <div class="status-header">
-                        <span class="mode-badge">SOLO TEST MODE</span>
+                        <span class="mode-badge" id="modeBadge">SOLO TEST MODE</span>
                     </div>
                     <div class="status-main">
                         <div id="circuitStatus" class="circuit-status">CIRCUIT OPEN</div>
@@ -62,13 +86,29 @@
             <!-- Instructions Panel -->
             <div class="instructions-panel">
                 <h2>📖 How to Use</h2>
-                <ol class="instructions-list">
-                    <li><strong>Click "Start"</strong> and allow camera access</li>
-                    <li><strong>Raise both hands</strong> above your shoulders</li>
-                    <li><strong>Stay still</strong> to close the circuit and start music</li>
-                    <li><strong>Keep very still</strong> to unlock all 3 audio layers (Drums + Bass + Harmony)</li>
-                    <li><strong>Lower hands</strong> to stop the music</li>
-                </ol>
+
+                <div id="soloInstructions">
+                    <h3>Solo Mode (1 Person)</h3>
+                    <ol class="instructions-list">
+                        <li><strong>Select "Solo Mode"</strong> and click "Start"</li>
+                        <li><strong>Allow camera access</strong> when prompted</li>
+                        <li><strong>Raise both hands</strong> above your shoulders</li>
+                        <li><strong>Stay still</strong> to close the circuit and start music</li>
+                        <li><strong>Keep very still</strong> to unlock all 3 audio layers</li>
+                    </ol>
+                </div>
+
+                <div id="multiInstructions" style="display: none;">
+                    <h3>Multi-Person Mode</h3>
+                    <ol class="instructions-list">
+                        <li><strong>Select "Multi-Person Mode"</strong> and choose number of people</li>
+                        <li><strong>Click "Start"</strong> and allow camera access</li>
+                        <li><strong>Stand in a line</strong> facing the camera</li>
+                        <li><strong>All raise hands</strong> above shoulders</li>
+                        <li><strong>Hold hands</strong> to form a circuit (right hand to next person's left hand)</li>
+                        <li><strong>Stay connected</strong> to keep the music playing</li>
+                    </ol>
+                </div>
 
                 <div class="info-box">
                     <h3>🎶 Layered Music System</h3>
@@ -77,13 +117,18 @@
                         <li><strong>Moderately Stable:</strong> 2 Layers (Drums + Bass)</li>
                         <li><strong>Slight Movement:</strong> 1 Layer (Drums only)</li>
                     </ul>
-                    <p class="tip">💡 <strong>Tip:</strong> Raise your hands and stay completely still to experience the full layered music!</p>
+                    <p class="tip">💡 <strong>Tip:</strong> Raise your hands and stay completely still to experience the
+                        full layered music!</p>
                 </div>
 
                 <div class="info-box technical">
                     <h3>🔧 Technical Info</h3>
-                    <p><strong>Solo Test Mode:</strong> Your pose is replicated to 3 virtual positions (A, B, C) to simulate the full circuit experience.</p>
-                    <p><strong>Circuit Closes When:</strong> All virtual persons have hands raised AND the distances between their hands are small enough.</p>
+                    <p><strong>Solo Mode:</strong> Your pose is replicated to 3 virtual positions (A, B, C) to simulate
+                        the full circuit experience.</p>
+                    <p><strong>Multi-Person Mode:</strong> Detects multiple people and forms a circuit when everyone
+                        holds hands in sequence.</p>
+                    <p><strong>Circuit Closes When:</strong> All persons have hands raised AND the distances between
+                        connected hands are small enough.</p>
                 </div>
             </div>
         </main>
@@ -120,4 +165,5 @@
     <!-- JavaScript Modules -->
     <script type="module" src="app.js"></script>
 </body>
+
 </html>

@@ -124,13 +124,73 @@ export class PoseDetector {
     }
 
     /**
-     * Cleanup resources
+     * Extract multiple persons from pose detection results
+     * @param {Array} poses - Detected poses
+     * @param {number} videoWidth - Video width
+     * @param {number} videoHeight - Video height
+     * @param {number} maxPersons - Maximum number of persons to extract
+     * @returns {Array} Array of person objects
      */
-    dispose() {
-        if (this.detector) {
-            this.detector.dispose();
-            this.detector = null;
+    extractMultiplePersons(poses, videoWidth, videoHeight, maxPersons = 5) {
+        if (!poses || poses.length === 0) {
+            return [];
         }
+
+        const persons = [];
+        const personIds = ['A', 'B', 'C', 'D', 'E'];
+
+        for (let i = 0; i < Math.min(poses.length, maxPersons); i++) {
+            const pose = poses[i];
+            const keypoints = pose.keypoints;
+
+            const leftShoulder = keypoints[5];
+            const rightShoulder = keypoints[6];
+            const leftWrist = keypoints[9];
+            const rightWrist = keypoints[10];
+
+            // Check confidence scores
+            const minConfidence = 0.3;
+            if (leftShoulder.score < minConfidence ||
+                rightShoulder.score < minConfidence ||
+                leftWrist.score < minConfidence ||
+                rightWrist.score < minConfidence) {
+                continue;
+            }
+
+            // Normalize coordinates
+            const person = {
+                id: personIds[i],
+                leftShoulder: {
+                    x: leftShoulder.x / videoWidth,
+                    y: leftShoulder.y / videoHeight
+                },
+                rightShoulder: {
+                    x: rightShoulder.x / videoWidth,
+                    y: rightShoulder.y / videoHeight
+                },
+                leftWrist: {
+                    x: leftWrist.x / videoWidth,
+                    y: leftWrist.y / videoHeight
+                },
+                rightWrist: {
+                    x: rightWrist.x / videoWidth,
+                    y: rightWrist.y / videoHeight
+                },
+                xCenter: (leftShoulder.x + rightShoulder.x) / 2 / videoWidth
+            };
+
+            persons.push(person);
+        }
+
+        // Sort by x position (left to right)
+        persons.sort((a, b) => a.xCenter - b.xCenter);
+
+        // Reassign IDs after sorting
+        persons.forEach((person, index) => {
+            person.id = personIds[index];
+        });
+
+        return persons;
     }
 }
 

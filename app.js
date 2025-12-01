@@ -20,6 +20,14 @@ class BodyCircuitBandApp {
         this.statusDot = document.getElementById('statusDot');
         this.appStatus = document.getElementById('appStatus');
 
+        // Mode selection elements
+        this.modeRadios = document.querySelectorAll('input[name="mode"]');
+        this.personCountSelector = document.getElementById('personCountSelector');
+        this.personCountSelect = document.getElementById('personCount');
+        this.modeBadge = document.getElementById('modeBadge');
+        this.soloInstructions = document.getElementById('soloInstructions');
+        this.multiInstructions = document.getElementById('multiInstructions');
+
         // Status panel elements
         this.circuitStatus = document.getElementById('circuitStatus');
         this.avgDistanceEl = document.getElementById('avgDistance');
@@ -32,7 +40,7 @@ class BodyCircuitBandApp {
         // Core modules
         this.poseDetector = new PoseDetector();
         this.soloMode = new SoloMode();
-        this.circuitDetector = new CircuitDetector(0.30, 10);
+        this.circuitDetector = null; // Will be initialized based on person count
         this.audioController = new AudioController();
         this.visualFeedback = new VisualFeedback(this.canvas);
 
@@ -41,10 +49,41 @@ class BodyCircuitBandApp {
         this.stream = null;
         this.animationFrameId = null;
         this.frameCount = 0;
+        this.currentMode = 'solo';
+        this.personCount = 3;
 
         // Bind event listeners
         this.startBtn.addEventListener('click', () => this.start());
         this.stopBtn.addEventListener('click', () => this.stop());
+
+        // Mode selection listeners
+        this.modeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => this.handleModeChange(e.target.value));
+        });
+        this.personCountSelect.addEventListener('change', (e) => {
+            this.personCount = parseInt(e.target.value);
+        });
+    }
+
+    /**
+     * Handle mode change
+     */
+    handleModeChange(mode) {
+        this.currentMode = mode;
+
+        if (mode === 'solo') {
+            this.personCountSelector.style.display = 'none';
+            this.modeBadge.textContent = 'SOLO MODE';
+            this.soloInstructions.style.display = 'block';
+            this.multiInstructions.style.display = 'none';
+            this.personCount = 3; // Solo mode always uses 3 virtual persons
+        } else {
+            this.personCountSelector.style.display = 'flex';
+            this.personCount = parseInt(this.personCountSelect.value);
+            this.modeBadge.textContent = `MULTI-PERSON MODE (${this.personCount} people)`;
+            this.soloInstructions.style.display = 'none';
+            this.multiInstructions.style.display = 'block';
+        }
     }
 
     /**
@@ -120,6 +159,10 @@ class BodyCircuitBandApp {
             this.startBtn.disabled = true;
             this.showLoading('Initializing camera...');
 
+            // Initialize circuit detector based on mode
+            this.circuitDetector = new CircuitDetector(0.30, 10);
+            console.log(`🎯 Mode: ${this.currentMode}, Person count: ${this.personCount}`);
+
             // Initialize camera
             const cameraOk = await this.initCamera();
             if (!cameraOk) {
@@ -148,7 +191,7 @@ class BodyCircuitBandApp {
             // Start detection loop
             this.detectLoop();
 
-            console.log('🚀 Application started');
+            console.log(`🚀 Application started in ${this.currentMode} mode`);
         } catch (error) {
             console.error('❌ Failed to start application:', error);
             alert('Failed to start application: ' + error.message);
